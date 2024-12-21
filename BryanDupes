@@ -1,19 +1,18 @@
 local player = game.Players.LocalPlayer
 
--- Create the main window using Rayfield
-local Window = Rayfield:CreateWindow({
-    Name = "Dinosaur Skin Dupe Script",
-    LoadingTitle = "Dinosaur Skin Dupe Script",
-    LoadingSubtitle = "by YourNameHere",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "RayfieldDinosaurSkinConfig",
-        FileName = "DinosaurSkinDupeConfig"
-    }
+-- Load the Orion library
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+
+-- Create the main window
+local Window = OrionLib:MakeWindow({
+    Name = "Dinosaur Skin Dupe",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "OrionDinosaurSkinConfig"
 })
 
 -- Create the main tab for Dinosaur Skins
-local DinosaurSkinTab = Window:CreateTab({
+local DinosaurSkinTab = Window:MakeTab({
     Name = "Dinosaur Skin",
     Icon = "rbxassetid://4483362458"
 })
@@ -90,10 +89,10 @@ local function reinitializeRegisterAndSaveTokens(dinoName, duplicateCount)
             warn("Error during player data refresh: " .. err)
         end
 
-        -- Force a save on the player's data to ensure persistence
+        -- Force a save on the player's data to ensure persistence using UpdateObtainedTokensDS in trading map
         local success, err = pcall(function()
             workspace.GameFunctions.UpdateObtainedTokensDS:InvokeServer()
-            print("Forced save on player data.")
+            print("Forced save on player data in trading map.")
         end)
 
         if not success then
@@ -107,10 +106,10 @@ end
 -- Text input to enter dinosaur name
 local dinosaurNameInput
 
-DinosaurSkinTab:CreateInput({
+DinosaurSkinTab:AddTextbox({
     Name = "Dinosaur Name",
-    PlaceholderText = "",
-    RemoveTextAfterFocusLost = false,
+    Default = "",
+    TextDisappear = false,
     Callback = function(value)
         dinosaurNameInput = value
         print("Entered dinosaur name:", value)
@@ -120,18 +119,18 @@ DinosaurSkinTab:CreateInput({
 -- Text input to enter number of duplicates
 local duplicateCountInput
 
-DinosaurSkinTab:CreateInput({
+DinosaurSkinTab:AddTextbox({
     Name = "Duplicate Count",
-    PlaceholderText = "10",  -- Default to duplicating 10 instances
-    RemoveTextAfterFocusLost = false,
+    Default = "10",  -- Default to duplicating 10 instances
+    TextDisappear = false,
     Callback = function(value)
         duplicateCountInput = tonumber(value)
         print("Entered duplicate count:", value)
     end
 })
 
--- Button to duplicate the existing skin
-DinosaurSkinTab:CreateButton({
+-- Button to duplicate the existing skin and ensure it is registered and saved
+DinosaurSkinTab:AddButton({
     Name = "Get Skin",
     Callback = function()
         if dinosaurNameInput and dinosaurNameInput ~= "" and duplicateCountInput then
@@ -142,5 +141,5 @@ DinosaurSkinTab:CreateButton({
     end
 })
 
--- Initialize Rayfield
-Rayfield:LoadConfiguration()
+-- Initialize Orion
+OrionLib:Init()
